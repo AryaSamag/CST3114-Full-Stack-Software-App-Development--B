@@ -1,0 +1,17 @@
+{
+  "name": "cst3114-full-stack-software-app-development--b",
+  "version": "1.0.0",
+  "description": "Full Stack Software App Development for CST3114 Backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
+  }
+}
