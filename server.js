@@ -43,6 +43,51 @@ app.get('/lessons', async (req, res) => {
   }
 });
 
+// GET search lessons
+app.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim() === '') {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    const searchQuery = query.toLowerCase();
+
+    // Search in subject, location, and convert price/spaces to string for search
+    const lessons = await db.collection('lessons').find({
+      $or: [
+        { subject: { $regex: searchQuery, $options: 'i' } },
+        { location: { $regex: searchQuery, $options: 'i' } }
+      ]
+    }).toArray();
+
+    // Also filter by price or spaces if the query is numeric
+    const numericQuery = parseFloat(query);
+    if (!isNaN(numericQuery)) {
+      const allLessons = await db.collection('lessons').find({}).toArray();
+      const numericMatches = allLessons.filter(lesson => 
+        lesson.price === numericQuery || lesson.spaces === numericQuery
+      );
+      
+      // Merge results and remove duplicates
+      const mergedLessons = [...lessons];
+      numericMatches.forEach(match => {
+        if (!mergedLessons.find(l => l._id.toString() === match._id.toString())) {
+          mergedLessons.push(match);
+        }
+      });
+      
+      return res.json(mergedLessons);
+    }
+
+    res.json(lessons);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to search lessons' });
+  }
+});
+
 // PUT update lesson spaces
 app.put('/lessons/:id', async (req, res) => {
   try {
