@@ -138,8 +138,7 @@ app.post('/orders', async (req, res) => {
       city, 
       state, 
       zip, 
-      phone, 
-      method, 
+      phone,
       sendGift, 
       giftPhone, 
       cart 
@@ -178,7 +177,6 @@ app.post('/orders', async (req, res) => {
       state,
       zip,
       phone,
-      method,
       sendGift,
       giftPhone,
       cart,
