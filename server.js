@@ -44,6 +44,22 @@ MongoClient.connect(uri)
     console.error('Failed to connect to MongoDB', err);
   });
 
+// Home route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'CST3144 After-School Lessons API',
+    status: 'Server is running',
+    endpoints: {
+      lessons: 'GET /lessons - Get all lessons',
+      search: 'GET /search?query=... - Search lessons',
+      updateLesson: 'PUT /lessons/:id - Update lesson spaces',
+      createOrder: 'POST /orders - Create a new order',
+      getOrders: 'GET /orders - Get all orders'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
   // GET all lessons
 app.get('/lessons', async (req, res) => {
   try {
