@@ -117,6 +117,17 @@ app.put('/lessons/:id', async (req, res) => {
   }
 });
 
+// GET all orders
+app.get('/orders', async (req, res) => {
+  try {
+    const orders = await db.collection('order').find({}).toArray();
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
 // POST create order
 app.post('/orders', async (req, res) => {
   try {
