@@ -120,7 +120,7 @@ app.put('/lessons/:id', async (req, res) => {
 // GET all orders
 app.get('/orders', async (req, res) => {
   try {
-    const orders = await db.collection('order').find({}).toArray();
+    const orders = await db.collection('orders').find({}).toArray();
     res.json(orders);
   } catch (err) {
     console.error(err);
