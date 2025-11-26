@@ -13,7 +13,10 @@ let db;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('images')); // Serve images folder
+
+// Serve static files
+app.use('/images', express.static('images')); // Serve images from /images route
+app.use(express.static('../CST3114-Full-Stack-Software-App-Development--F')); // Serve frontend files
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
