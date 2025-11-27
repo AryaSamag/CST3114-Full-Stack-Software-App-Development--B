@@ -193,6 +193,33 @@ app.post('/orders', async (req, res) => {
       return res.status(400).json({ error: 'Gift phone must contain numbers only' });
     }
 
+    // Check if enough spaces are available for each item
+    for (const item of cart) {
+      console.log('Checking item:', item);
+      console.log('Item ID:', item.id);
+      
+      let lessonId;
+      try {
+        // Handle both string and ObjectId formats
+        lessonId = typeof item.id === 'string' ? new ObjectId(item.id) : item.id;
+      } catch (err) {
+        console.error('Invalid ObjectId:', item.id);
+        return res.status(400).json({ error: `Invalid lesson ID: ${item.id}` });
+      }
+      
+      const lesson = await db.collection('lessons').findOne({ _id: lessonId });
+      console.log('Found lesson:', lesson);
+      
+      if (!lesson) {
+        return res.status(404).json({ error: `Lesson not found: ${item.subject}` });
+      }
+      if (lesson.spaces < item.quantity) {
+        return res.status(400).json({ 
+          error: `Not enough spaces for ${item.subject}. Available: ${lesson.spaces}, Requested: ${item.quantity}` 
+        });
+      }
+    }
+
     const order = {
       firstName,
       lastName,
@@ -208,7 +235,22 @@ app.post('/orders', async (req, res) => {
       createdAt: new Date()
     };
 
+    // Update lesson spaces in database for each item in cart
+    for (const item of cart) {
+      const lessonId = typeof item.id === 'string' ? new ObjectId(item.id) : item.id;
+      console.log('Updating lesson:', lessonId, 'decreasing by:', item.quantity);
+      
+      const updateResult = await db.collection('lessons').updateOne(
+        { _id: lessonId },
+        { $inc: { spaces: -item.quantity } }
+      );
+      
+      console.log('Update result:', updateResult);
+    }
+
     const result = await db.collection('orders').insertOne(order);
+    console.log('Order created:', result.insertedId);
+    
     res.status(201).json({ 
       message: 'Order created successfully', 
       orderId: result.insertedId 
