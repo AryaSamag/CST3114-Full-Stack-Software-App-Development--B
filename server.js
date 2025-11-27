@@ -32,9 +32,20 @@ app.use((req, res, next) => {
 // Connect to MongoDB Atlas and start server
 console.log('Attempting to connect to MongoDB...');
 MongoClient.connect(uri)
-  .then(client => {
+  .then(async client => {
     console.log('Connected to MongoDB Atlas');
     db = client.db(dbName);
+
+    // Reset all lesson spaces to 5 on server restart
+    try {
+      const result = await db.collection('lessons').updateMany(
+        {},
+        { $set: { spaces: 5 } }
+      );
+      console.log(`Reset ${result.modifiedCount} lessons to 5 spaces`);
+    } catch (err) {
+      console.error('Failed to reset lesson spaces:', err);
+    }
 
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}`);
